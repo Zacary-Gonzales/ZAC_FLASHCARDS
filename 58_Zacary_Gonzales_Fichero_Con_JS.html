@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+        *{
+            margin:0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        body{
+            background-color: cornsilk;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .containerall{
+            background-color: rgb(237, 249, 135);
+            margin: 20px;
+            width: 97%;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .info{
+            background: rgb(255, 191, 0);
+            width:97%;
+            height: auto;
+            padding: 40px;
+            margin: 20px;
+            display: grid;
+            row-gap: 20px;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr;
+            border-radius: 10px;
+        }
+
+        .info *{
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .info .label-entry-pregunta,.label-entry-respuesta{
+            width: 80%;   
+        }
+
+        .label-pregunta,.label-entry-pregunta,.label-respuesta,.label-entry-respuesta,.elegirid,.button-eliminar{
+            padding: 10px;
+        }
+        
+        .label-entry-pregunta input, .label-entry-respuesta input{
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .label-entry-pregunta input:focus, .label-entry-respuesta input:focus{
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .elegirid input{
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        button{
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover{
+            background-color: #45a049;
+        }
+
+        .button-eliminar button{
+            background-color: #f44336;
+        }
+
+        .button-eliminar button:hover{
+            background-color: #da190b;
+        }
+
+        .flashcards{
+            background-color: rgb(255, 255, 134);
+            min-height: 40vh;
+            width: 97%;
+            margin: 0px 20px 20px 20px;
+            padding: 40px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .flashcard{   /*Cada flashcard es un contenedor, en ese contenedor hay 2 lados (ambos con su parte trasera oculta) y un lado esta invertido y colocado en una perspectiva menor al otro. A modo de que cuando gire ammbos se muestren de manera correcta.*/
+            perspective: 1000px;
+            height: 200px;
+            position: relative;
+        }
+
+        .flashcard-inner{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: all 1.0s ease-in-out;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped .flashcard-inner{
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 2px solid #ddd;
+        }
+
+        .flashcard-front{
+            background-color: #d32b2b;
+            color: white;
+        }
+
+        .flashcard-back{
+            background-color: #ffa217;
+            color: white;
+            transform: rotateY(180deg) scale(1.05);
+        }
+
+        .flashcard-number{
+            position: absolute;
+            top: 10px;
+            right: 45%;
+            background-color: rgba(0,0,0,0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .flashcard-content{
+            font-size: 16px;
+            line-height: 1.4;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .flashcard-label{
+            font-size: 12px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .no-cards{
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-top: 50px;
+        }
+
+        .stats{
+            background-color: rgba(255, 234, 0, 0.801);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .info{
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .info *{
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .flashcards{
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="containerall">
+        
+        <div class="info">
+            <div class="info-pregunta">
+                <div class="label-pregunta">Introduce Tu Pregunta:</div>
+                <div class="label-entry-pregunta"><input type="text" id="preguntaInput" placeholder="PREGUNTA AQUI"></div>
+            </div>
+            <div class="info-respuesta">
+                <div class="label-respuesta">Introduce La Respuesta: </div>
+                <div class="label-entry-respuesta"><input type="text" id="respuestaInput" placeholder="RESPUESTA AQUI"> </div>
+            </div>
+            <div class="eliminacion">
+                <div class="elegirid"><input type="number" id="eliminarInput" placeholder="Numero Flashcard A Eliminar" min="1"></div>
+                <div class="button-eliminar"><button type="button" >ELIMINAR</button></div>
+            </div>
+            <div class="button-registrar"><button type="button" >INTRODUCIR</button></div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            Flashcards Ingresadas: <span id="totalCards">0</span>
+        </div>
+
+        <div class="flashcards" id="flashcardsContainer">
+            <div class="no-cards">
+                Aun No Has Introducido Flashcards. Ingresa Una :D!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let flashcards = [];
+        let contadorId = 1;
+
+        const eliminarflash = document.querySelector(".button-eliminar");
+        const registrarflash = document.querySelector(".button-registrar");
+
+        registrarflash.addEventListener("click", agregarFlashcard);
+        eliminarflash.addEventListener("click", eliminarFlashcard);  //aqui le asigno una funcion a los botones de eliminar y registrar
+
+        function agregarFlashcard() {
+            const preguntaInput = document.getElementById('preguntaInput');
+            const respuestaInput = document.getElementById('respuestaInput'); //aqui recojo los valores de los campos de pregunnta y respuesta
+            
+            const pregunta = preguntaInput.value.trim();
+            const respuesta = respuestaInput.value.trim(); //se le quitan espacios no deseados
+            
+            if (!pregunta || !respuesta) {
+                alert('Por favor, completa tanto la pregunta como la respuesta.');  // el !pregunta es como decir: Si no existe pregunta o su valor es nulo
+                return;   //si es verdad, no ejecutara el resto del codigo
+            }
+            
+            const nuevaFlashcard = {   //crea un objeto con el id(usando un contador en variable global) y la pregunta y respuesta
+                id: contadorId,
+                pregunta: pregunta,
+                respuesta: respuesta
+            };
+            
+            flashcards.push(nuevaFlashcard);  //lo añade a una lista global y incrementa el contador global
+            contadorId++;
+            
+            
+            preguntaInput.value = '';  //restablece los campos de la pregunta y respuesta
+            respuestaInput.value = '';
+            
+            
+            mostrarFlashcards();  //muestra las flashcards nuevas
+            actualizarStats();
+        }
+
+        function eliminarFlashcard() {
+            const numeroEliminar = parseInt(document.getElementById('eliminarInput').value);  //obtiene el numero de flashcard ingresado en el input
+            
+            if (numeroEliminar < 1||!numeroEliminar) {  //si es menor a 1 o no se ha ingresado nada tira alerta y return
+                alert('Numero Invalido De Flashcard.');
+                return;
+            }
+            
+            const index = flashcards.findIndex(card =>card.id === numeroEliminar);  //usa una funcion para encontrar el registro en la lista global donde el valor id de ese objeto equivale al inngresado en el input
+            
+            if (index === -1) {  //si no se encuentra no ejecuta el resto
+                alert('No se encontró una flashcard con ese numero.');
+                return;
+            }
+            
+            if (confirm(`¿Eliminar la tarjeta #${numeroEliminar}?`)) {  //si se encuentra se usa una cosa llamada confirm, investigue que era porque no encontraba como hacerle para confirmar si de verdad queria borrarlo
+                flashcards.splice(index, 1);  //quita el elemento 
+                eliminarInput.value = ''; //restablece el numero en el input
+                mostrarFlashcards();  //actualiza los flashcards en el contenedor flashcard
+                actualizarStats();
+            }
+        }
+
+        function voltearFlashcard(id) {  //usando variable local id
+            const flashcard = document.querySelector(`[data-id="${id}"]`);  //selecciona el flashcard en el que el id es ese y le asigna la clase flipped (girado)  
+            flashcard.classList.toggle('flipped');
+        }
+
+        function mostrarFlashcards() {  //obtiene el elemento en el que se contienen los flashcards
+            const container = document.getElementById('flashcardsContainer');
+            
+            if (flashcards.length === 0) { //si la lista global es de 0 solo le pone que le metamos flashcards
+                container.innerHTML = '<div class="no-cards"> Ingresa Flashcards Porfa</div>';
+                return;
+            }
+            
+            container.innerHTML = ''; //reestablece el contenido
+
+            flashcards.forEach(card => { //para cada tarjeta en la lista global
+                const flashcardDiv = document.createElement('div'); //crea un div
+                flashcardDiv.className = 'flashcard'; //le da la clase flashcard
+                flashcardDiv.dataset.id = card.id; //le da el id del objeto en la lista global
+                flashcardDiv.onclick = () => voltearFlashcard(card.id);  //cada que se da un clicj ejecuta la funcion voltearflashcard
+                
+                flashcardDiv.innerHTML = ` 
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <div class="flashcard-number">#${card.id}</div>
+                            <div class="flashcard-label">Pregunta</div>
+                            <div class="flashcard-content">${card.pregunta}</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="flashcard-number">#${card.id}</div>
+                            <div class="flashcard-label">Respuesta</div>
+                            <div class="flashcard-content">${card.respuesta}</div>
+                        </div>
+                    </div>
+                `; //establece el html de cada flashcard, colocando la parte frontal y reversa, lo unico que realmente cambia es card.pregunta y card.respuesta
+                
+                container.append(flashcardDiv);  //añade el div creado al contenedor
+            });
+        }
+
+        function actualizarStats() {
+            const statsDiv = document.getElementById('stats');
+            const totalCards = document.getElementById('totalCards'); 
+            
+            if (flashcards.length > 0) {
+                statsDiv.style.display = 'block'; //si hay un elemento muestra este campo
+                totalCards.textContent = flashcards.length; //y le da la longitud de la lista global
+            } else {
+                statsDiv.style.display = 'none'; //si no hay elementos oculta este campo
+            }
+        }
+
+        document.getElementById('preguntaInput')
+        preguntaInput.addEventListener('keypress', function(e) { //solo es un detalle, 'keypress' es cuando ingresamos una tecla y resulta que podemos confirmar que tecla se tecleo.
+            if (e.key === 'Enter') {
+                document.getElementById('respuestaInput').focus();
+            }
+        });
+
+        document.getElementById('respuestaInput')
+        respuestaInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                agregarFlashcard();
+            }
+        });
+
+        document.getElementById('eliminarInput')
+        eliminarInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                eliminarFlashcard();
+            }
+        });
+
+        mostrarFlashcards(); //inicializa el contenedor (el campo que dice que le metan flashcards)
+    </script>
+</body>
+</html>
